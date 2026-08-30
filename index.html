@@ -108,9 +108,6 @@
         .btn-download:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 35px rgba(0,229,255,0.6); }
         .btn-more { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid var(--border2); color: var(--text); border-radius: 14px; padding: 14px 18px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .btn-more:hover { background: rgba(0,229,255,0.15); border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
-        .edit-btn { position: absolute; top: 15px; left: 58px; background: rgba(74,158,255,0.15); border: 1px solid rgba(74,158,255,0.3); color: var(--blue); width: 35px; height: 35px; border-radius: 10px; cursor: pointer; font-size: 15px; display: none; align-items: center; justify-content: center; transition: all 0.3s; z-index: 10; }
-        .edit-btn:hover { background: var(--blue); color: white; transform: scale(1.1) rotate(90deg); }
-        .card.admin-mode .edit-btn { display: flex; }
         .delete-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,59,59,0.15); border: 1px solid rgba(255,59,59,0.3); color: var(--red); width: 35px; height: 35px; border-radius: 10px; cursor: pointer; font-size: 15px; display: none; align-items: center; justify-content: center; transition: all 0.3s; z-index: 10; }
         .delete-btn:hover { background: var(--red); color: white; transform: scale(1.1) rotate(90deg); }
         .card.admin-mode .delete-btn { display: flex; }
@@ -192,6 +189,12 @@
         .popup-notify-title { font-size: 14px; font-weight: 800; margin-bottom: 5px; color: var(--cyan); }
         .popup-notify-msg { font-size: 13px; color: var(--text); }
 
+        /* ===== TÌM KIẾM & SẮP XẾP ===== */
+        .search-sort-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-input { flex: 1; min-width: 200px; padding: 12px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; outline: none; }
+        .search-input:focus { border-color: var(--cyan); }
+        .sort-select { padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; cursor: pointer; }
+
         @media (max-width: 600px) {
             .header { padding: 15px 20px; }
             .logo-text { font-size: 20px; }
@@ -246,6 +249,16 @@
     <div id="noticeBanner"></div>
     <div class="top-title">TOP 1 EVERY DAY</div>
 
+    <!-- TÌM KIẾM & SẮP XẾP -->
+    <div class="search-sort-bar">
+        <input type="text" class="search-input" id="searchInput" placeholder="Tìm kiếm bài đăng..." oninput="renderList()">
+        <select class="sort-select" id="sortSelect" onchange="renderList()">
+            <option value="newest">Mới nhất</option>
+            <option value="oldest">Cũ nhất</option>
+            <option value="most_downloaded">Nhiều lượt tải nhất</option>
+        </select>
+    </div>
+
     <div class="categories" id="catContainer"></div>
 
     <div class="container">
@@ -264,6 +277,7 @@
         <div class="popup-notify-msg" id="popupNotifyMsg"></div>
     </div>
 
+    <!-- MENU ADMIN -->
     <div class="admin-menu" id="adminMenu">
         <button class="admin-menu-btn" onclick="showAddHackModal()"><i class="fa-solid fa-plus"></i> Tạo bài đăng</button>
         <button class="admin-menu-btn" onclick="showEditHackModal()"><i class="fa-solid fa-pen"></i> Sửa bài đăng</button>
@@ -272,6 +286,9 @@
         <button class="admin-menu-btn" onclick="showAddGroupModal()"><i class="fa-solid fa-layer-group"></i> Tạo danh mục lớn</button>
         <button class="admin-menu-btn" onclick="showDeleteGroupModal()"><i class="fa-solid fa-layer-minus"></i> Xóa danh mục lớn</button>
         <button class="admin-menu-btn" onclick="showDeleteHackModal()"><i class="fa-solid fa-trash"></i> Xóa bài đăng</button>
+        <button class="admin-menu-btn" onclick="showBackupModal()"><i class="fa-solid fa-download"></i> Sao lưu dữ liệu</button>
+        <button class="admin-menu-btn" onclick="showThemeModal()"><i class="fa-solid fa-palette"></i> Đổi màu chủ đề</button>
+        <button class="admin-menu-btn" onclick="showStats()"><i class="fa-solid fa-chart-line"></i> Thống kê lượt truy cập</button>
         <button class="admin-menu-btn" onclick="showChangePassModal()"><i class="fa-solid fa-key"></i> Đổi mã bí mật</button>
         <button class="admin-menu-btn" onclick="showNoticeModal()"><i class="fa-solid fa-bullhorn"></i> Tạo thông báo</button>
         <button class="admin-menu-btn" onclick="showMaintenanceModal()"><i class="fa-solid fa-wrench"></i> Bật/Tắt bảo trì</button>
@@ -282,7 +299,7 @@
         <i class="fa-solid fa-user-shield"></i>
     </button>
 
-    <!-- Modals -->
+    <!-- MODALS -->
     <div class="modal-overlay" id="detailModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -376,6 +393,32 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="backupModal">
+        <div class="modal-box" style="max-width:500px;">
+            <button class="modal-close" onclick="closeModal('backupModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-download"></i> Sao lưu dữ liệu</div>
+            <div class="modal-subtitle">Tải xuống file JSON hoặc khôi phục</div>
+            <button class="modal-main-btn" onclick="exportData()"><i class="fa-solid fa-file-export"></i> Xuất dữ liệu</button>
+            <div style="margin-top:15px;">
+                <label class="form-label">DÁN JSON ĐỂ KHÔI PHỤC</label>
+                <textarea class="form-textarea" id="restoreData" placeholder='{"hacks":[...],"categories":[...]}'></textarea>
+                <button class="modal-main-btn" onclick="importData()" style="margin-top:10px;"><i class="fa-solid fa-file-import"></i> Khôi phục</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="themeModal">
+        <div class="modal-box" style="max-width:420px;">
+            <button class="modal-close" onclick="closeModal('themeModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-palette"></i> Đổi màu chủ đề</div>
+            <label class="form-label">MÀU NỀN</label>
+            <input type="color" class="form-input" id="bgColor" onchange="applyTheme()">
+            <label class="form-label">MÀU NỮA</label>
+            <input type="color" class="form-input" id="btnColor" onchange="applyTheme()">
+            <button class="modal-main-btn" onclick="saveTheme()"><i class="fa-solid fa-check"></i> Lưu</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="addCategoryModal">
         <div class="modal-box" style="max-width:420px;">
             <button class="modal-close" onclick="closeModal('addCategoryModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -465,12 +508,12 @@
         const GIST_TOKEN = "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";
         const GIST_RAW = "https://gist.githubusercontent.com/binhgold0345-wq/4c8fab5608c8cdfc752c116d2bb958b1/raw/cf2dc704b000752cc103284ea597ef0af1215fbd/data.json";
 
-        // ===== MÃ BÍ MẬT ADMIN (LƯU TRONG LOCALSTORAGE ĐỂ ĐỔI ĐƯỢC) =====
+        // ===== MÃ BÍ MẬT ADMIN =====
         const DEFAULT_ADMIN_CODE = "0345498359k";
         let ADMIN_CODE = localStorage.getItem('adminCode') || DEFAULT_ADMIN_CODE;
-        let isAdmin = localStorage.getItem('isAdmin') === 'true'; // Lưu trạng thái đăng nhập
+        let isAdmin = localStorage.getItem('isAdmin') === 'true';
         let currentCategory = 'all';
-        let maintenanceMode = false;
+        let maintenanceMode = localStorage.getItem('maintenanceMode') === 'true';
 
         // ===== DỮ LIỆU GỐC =====
         let catGroups = [
@@ -483,6 +526,8 @@
         const catColors = { 'all': '#ffffff', 'ff': '#ff2d95', 'lq': '#4a9eff', '8ball': '#ffd700', 'minecraft': '#00ff88' };
 
         let hacks = [];
+        let searchTerm = '';
+        let sortBy = 'newest';
 
         // ===== TẠO SAO =====
         function createStars() {
@@ -551,12 +596,36 @@
             if (sorted.length === 0) list.innerHTML = '<div style="text-align:center; color:var(--sub); padding:10px;">Chưa có dữ liệu</div>';
         }
 
+        // ===== TÌM KIẾM & SẮP XẾP =====
+        function getFilteredSortedHacks() {
+            let filtered = hacks.filter(h => currentCategory === 'all' || h.category === currentCategory);
+            if (searchTerm) {
+                filtered = filtered.filter(h => (h.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || (h.desc || '').toLowerCase().includes(searchTerm.toLowerCase()));
+            }
+            switch (sortBy) {
+                case 'oldest':
+                    filtered.sort((a, b) => a.id.localeCompare(b.id));
+                    break;
+                case 'most_downloaded':
+                    filtered.sort((a, b) => (parseInt(localStorage.getItem('dl_' + b.id) || '0')) - (parseInt(localStorage.getItem('dl_' + a.id) || '0')));
+                    break;
+                default:
+                    filtered.sort((a, b) => b.id.localeCompare(a.id));
+            }
+            return filtered;
+        }
+
         // ===== RENDER DANH SÁCH =====
         function renderList() {
             if (maintenanceMode) { document.getElementById('hackList').innerHTML = ''; return; }
+            const searchInput = document.getElementById('searchInput');
+            const sortSelect = document.getElementById('sortSelect');
+            searchTerm = searchInput ? searchInput.value : '';
+            sortBy = sortSelect ? sortSelect.value : 'newest';
+
             const list = document.getElementById('hackList');
             list.innerHTML = '';
-            const filtered = hacks.filter(h => currentCategory === 'all' || h.category === currentCategory);
+            const filtered = getFilteredSortedHacks();
             filtered.forEach((hack, index) => {
                 const icon = catIcons[hack.category] || 'fa-gamepad';
                 const color = catColors[hack.category] || 'var(--sub)';
@@ -602,9 +671,7 @@
         function copyPostLink(id) {
             const cleanId = id.replace('#', '');
             const url = window.location.origin + window.location.pathname + '?id=' + cleanId;
-            navigator.clipboard.writeText(url).then(() => {
-                showToast('Đã sao chép link bài: ' + url);
-            }).catch(() => showToast('Lỗi copy!', 'error'));
+            navigator.clipboard.writeText(url).then(() => showToast('Đã sao chép link bài: ' + url)).catch(() => showToast('Lỗi copy!', 'error'));
         }
 
         // ===== MỞ MODAL TỪ URL (SỬA LỖI) =====
@@ -613,14 +680,10 @@
             const idParam = urlParams.get('id');
             if (idParam) {
                 const fullId = '#' + idParam;
-                // Chờ dữ liệu load xong rồi mới tìm
                 setTimeout(() => {
                     const hack = hacks.find(h => h.id === fullId);
-                    if (hack) {
-                        openModal(fullId);
-                    } else {
-                        showToast('Không tìm thấy bài đăng với ID: ' + idParam, 'error');
-                    }
+                    if (hack) openModal(fullId);
+                    else showToast('Không tìm thấy bài đăng với ID: ' + idParam, 'error');
                 }, 500);
             }
         }
@@ -685,6 +748,8 @@
         document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editModal'); });
         document.getElementById('editSelectModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editSelectModal'); });
         document.getElementById('changePassModal').addEventListener('click', function(e) { if (e.target === this) closeModal('changePassModal'); });
+        document.getElementById('backupModal').addEventListener('click', function(e) { if (e.target === this) closeModal('backupModal'); });
+        document.getElementById('themeModal').addEventListener('click', function(e) { if (e.target === this) closeModal('themeModal'); });
         document.getElementById('addCategoryModal').addEventListener('click', function(e) { if (e.target === this) closeModal('addCategoryModal'); });
         document.getElementById('deleteCategoryModal').addEventListener('click', function(e) { if (e.target === this) closeModal('deleteCategoryModal'); });
         document.getElementById('addGroupModal').addEventListener('click', function(e) { if (e.target === this) closeModal('addGroupModal'); });
@@ -717,7 +782,7 @@
         }
         function closePopupNotify() { document.getElementById('popupNotify').style.display = 'none'; }
 
-        // ===== ADMIN LOGIN (LƯU TRẠNG THÁI) =====
+        // ===== ADMIN LOGIN =====
         function toggleAdminMenu() {
             if (!isAdmin) { showLoginModal(); return; }
             const menu = document.getElementById('adminMenu');
@@ -732,7 +797,7 @@
             const pass = document.getElementById('adminPass').value;
             if (pass === ADMIN_CODE) {
                 isAdmin = true;
-                localStorage.setItem('isAdmin', 'true'); // Lưu trạng thái
+                localStorage.setItem('isAdmin', 'true');
                 showToast('Đăng nhập thành công!');
                 document.getElementById('adminPass').value = '';
                 closeModal('loginModal');
@@ -747,7 +812,7 @@
         }
         function logoutAdmin() {
             isAdmin = false;
-            localStorage.setItem('isAdmin', 'false'); // Xóa trạng thái
+            localStorage.setItem('isAdmin', 'false');
             document.getElementById('adminMenu').style.display = 'none';
             showToast('Đã đăng xuất!');
             renderList();
@@ -883,6 +948,64 @@
             closeModal('changePassModal');
         }
 
+        // ===== SAO LƯU DỮ LIỆU =====
+        function showBackupModal() { document.getElementById('backupModal').style.display = 'flex'; document.getElementById('restoreData').value = ''; }
+        function exportData() {
+            const data = JSON.stringify({ hacks, categories, catGroups }, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Đã tải xuống dữ liệu!');
+        }
+        function importData() {
+            const json = document.getElementById('restoreData').value.trim();
+            if (!json) { showToast('Dán JSON để khôi phục!', 'error'); return; }
+            try {
+                const data = JSON.parse(json);
+                hacks = data.hacks || [];
+                categories = data.categories || categories;
+                catGroups = data.catGroups || catGroups;
+                saveData();
+                renderList();
+                renderCategories();
+                showToast('Đã khôi phục dữ liệu!');
+                closeModal('backupModal');
+            } catch(e) {
+                showToast('JSON không hợp lệ!', 'error');
+            }
+        }
+
+        // ===== ĐỔI MÀU CHỦ ĐỀ =====
+        function showThemeModal() {
+            document.getElementById('themeModal').style.display = 'flex';
+            document.getElementById('bgColor').value = localStorage.getItem('bgColor') || '#04060d';
+            document.getElementById('btnColor').value = localStorage.getItem('btnColor') || '#00e5ff';
+        }
+        function applyTheme() {
+            document.documentElement.style.setProperty('--bg', document.getElementById('bgColor').value);
+            document.documentElement.style.setProperty('--cyan', document.getElementById('btnColor').value);
+        }
+        function saveTheme() {
+            localStorage.setItem('bgColor', document.getElementById('bgColor').value);
+            localStorage.setItem('btnColor', document.getElementById('btnColor').value);
+            showToast('Đã lưu màu chủ đề!');
+            closeModal('themeModal');
+        }
+
+        // ===== THỐNG KÊ LƯỢT TRUY CẬP =====
+        function incrementVisits() {
+            const visits = parseInt(localStorage.getItem('totalVisits') || '0') + 1;
+            localStorage.setItem('totalVisits', visits);
+        }
+        function showStats() {
+            const visits = parseInt(localStorage.getItem('totalVisits') || '0');
+            alert('Tổng lượt truy cập web: ' + visits);
+        }
+
         // ===== DANH MỤC THƯỜNG =====
         function showAddCategoryModal() { document.getElementById('addCategoryModal').style.display = 'flex'; document.getElementById('newCatName').value = ''; }
         function addCategory() {
@@ -908,7 +1031,7 @@
             saveData(); renderCategories(); renderList(); showToast('Đã xóa danh mục!'); closeModal('deleteCategoryModal');
         }
 
-        // ===== DANH MỤC LỚN (GROUPS) =====
+        // ===== DANH MỤC LỚN =====
         function showAddGroupModal() {
             document.getElementById('addGroupModal').style.display = 'flex';
             const sel = document.getElementById('groupCatSelect');
@@ -1008,7 +1131,7 @@
             closeModal('reportModal');
         }
 
-        // ===== LƯU DỮ LIỆU LÊN GIST =====
+        // ===== SAO LƯU LÊN GIST =====
         function saveData() {
             localStorage.setItem('myHackData', JSON.stringify({ hacks, categories, catGroups }));
             const updateUrl = `https://api.github.com/gists/${GIST_ID}`;
@@ -1023,9 +1146,7 @@
                     'X-GitHub-Api-Version': '2022-11-28'
                 },
                 body: JSON.stringify(payload)
-            }).then(r => r.json()).then(data => {
-                console.log('Đã lưu dữ liệu lên Gist!');
-            }).catch(err => console.error('Lỗi lưu Gist:', err));
+            }).then(r => r.json()).then(data => console.log('Đã lưu dữ liệu lên Gist!')).catch(err => console.error('Lỗi lưu Gist:', err));
         }
 
         // ===== TẢI DỮ LIỆU TỪ GIST =====
@@ -1066,6 +1187,7 @@
         }
 
         // ===== KHỞI CHẠY =====
+        incrementVisits();
         createStars();
         loadDataFromGist().then(() => {
             renderCategories();
