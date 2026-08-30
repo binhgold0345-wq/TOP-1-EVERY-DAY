@@ -222,7 +222,7 @@
             <div class="logo-wrap">
                 <img src="https://i.postimg.cc/vHCDCdDQ/IMG-6034.jpg" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/48/000000/00E5FF?text=TOP'">
                 <span class="logo-text">DownloadHub</span>
-                <span class="version-badge">v5.0</span>
+                <span class="version-badge">v6.0</span>
             </div>
         </div>
         <div class="header-right">
@@ -266,11 +266,16 @@
 
     <div class="admin-menu" id="adminMenu">
         <button class="admin-menu-btn" onclick="showAddHackModal()"><i class="fa-solid fa-plus"></i> Tạo bài đăng</button>
-        <button class="admin-menu-btn" onclick="showDeleteHackModal()"><i class="fa-solid fa-trash"></i> Xóa bài đăng</button>
+        <button class="admin-menu-btn" onclick="showEditHackModal()"><i class="fa-solid fa-pen"></i> Sửa bài đăng</button>
         <button class="admin-menu-btn" onclick="showAddCategoryModal()"><i class="fa-solid fa-folder-plus"></i> Tạo danh mục</button>
         <button class="admin-menu-btn" onclick="showDeleteCategoryModal()"><i class="fa-solid fa-folder-minus"></i> Xóa danh mục</button>
         <button class="admin-menu-btn" onclick="showAddGroupModal()"><i class="fa-solid fa-layer-group"></i> Tạo danh mục lớn</button>
         <button class="admin-menu-btn" onclick="showDeleteGroupModal()"><i class="fa-solid fa-layer-minus"></i> Xóa danh mục lớn</button>
+        <button class="admin-menu-btn" onclick="showDeleteHackModal()"><i class="fa-solid fa-trash"></i> Xóa bài đăng</button>
+        <button class="admin-menu-btn" onclick="showBackupModal()"><i class="fa-solid fa-download"></i> Sao lưu dữ liệu</button>
+        <button class="admin-menu-btn" onclick="showThemeModal()"><i class="fa-solid fa-palette"></i> Đổi màu chủ đề</button>
+        <button class="admin-menu-btn" onclick="showStats()"><i class="fa-solid fa-chart-line"></i> Thống kê lượt truy cập</button>
+        <button class="admin-menu-btn" onclick="showChangePassModal()"><i class="fa-solid fa-key"></i> Đổi mã bí mật</button>
         <button class="admin-menu-btn" onclick="showNoticeModal()"><i class="fa-solid fa-bullhorn"></i> Tạo thông báo</button>
         <button class="admin-menu-btn" onclick="showMaintenanceModal()"><i class="fa-solid fa-wrench"></i> Bật/Tắt bảo trì</button>
         <button class="admin-menu-btn" onclick="showReportModal()"><i class="fa-solid fa-flag"></i> Xem báo cáo</button>
@@ -322,6 +327,80 @@
             <button class="add-sub-btn" onclick="addSubRow()"><i class="fa-solid fa-plus"></i> Thêm tiêu đề phụ & link phụ</button>
             <button class="modal-main-btn" onclick="addHack()"><i class="fa-solid fa-save"></i> Đăng bài</button>
             <button class="modal-main-btn" onclick="closeModal('addModal')" style="background:var(--red); margin-top:10px;"><i class="fa-solid fa-xmark"></i> Hủy</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('editModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-pen"></i> Sửa bài đăng</div>
+            <div class="modal-subtitle">Cập nhật thông tin bài viết</div>
+            <label class="form-label">TIÊU ĐỀ CHÍNH</label>
+            <input type="text" class="form-input" id="editTitle">
+            <label class="form-label">MÔ TẢ</label>
+            <textarea class="form-textarea" id="editDesc"></textarea>
+            <label class="form-label">ẢNH/VIDEO XEM TRƯỚC (URL)</label>
+            <input type="text" class="form-input" id="editPreviewUrl">
+            <label class="form-label">DANH MỤC</label>
+            <select class="form-select" id="editCategory"></select>
+            <label class="form-label">LINK CHÍNH</label>
+            <input type="text" class="form-input" id="editMainLink">
+            <label class="form-label">TIÊU ĐỀ PHỤ + LINK PHỤ</label>
+            <div id="editSubRowsContainer"></div>
+            <button class="add-sub-btn" onclick="addEditSubRow()"><i class="fa-solid fa-plus"></i> Thêm tiêu đề phụ & link phụ</button>
+            <button class="modal-main-btn" onclick="saveEditHack()"><i class="fa-solid fa-save"></i> Lưu thay đổi</button>
+            <button class="modal-main-btn" onclick="closeModal('editModal')" style="background:var(--red); margin-top:10px;"><i class="fa-solid fa-xmark"></i> Hủy</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editSelectModal">
+        <div class="modal-box" style="max-width:520px;">
+            <button class="modal-close" onclick="closeModal('editSelectModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-pen"></i> Chọn bài để sửa</div>
+            <label class="form-label">CHỌN BÀI ĐĂNG</label>
+            <select class="form-select" id="editSelect"></select>
+            <button class="modal-main-btn" onclick="loadEditForm()"><i class="fa-solid fa-arrow-right"></i> Tiếp tục</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="changePassModal">
+        <div class="modal-box" style="max-width:420px;">
+            <button class="modal-close" onclick="closeModal('changePassModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-key"></i> Đổi mã bí mật</div>
+            <div class="modal-subtitle">Thay đổi mã quản trị</div>
+            <label class="form-label">MÃ CŨ</label>
+            <input type="password" class="form-input" id="oldPass">
+            <label class="form-label">MÃ MỚI</label>
+            <input type="password" class="form-input" id="newPass">
+            <label class="form-label">XÁC NHẬN MÃ MỚI</label>
+            <input type="password" class="form-input" id="confirmNewPass">
+            <button class="modal-main-btn" onclick="changePassword()"><i class="fa-solid fa-check"></i> Đổi mã</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="backupModal">
+        <div class="modal-box" style="max-width:500px;">
+            <button class="modal-close" onclick="closeModal('backupModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-download"></i> Sao lưu dữ liệu</div>
+            <div class="modal-subtitle">Tải xuống file JSON hoặc khôi phục</div>
+            <button class="modal-main-btn" onclick="exportData()"><i class="fa-solid fa-file-export"></i> Xuất dữ liệu</button>
+            <div style="margin-top:15px;">
+                <label class="form-label">DÁN JSON ĐỂ KHÔI PHỤC</label>
+                <textarea class="form-textarea" id="restoreData" placeholder='{"hacks":[...],"categories":[...]}'></textarea>
+                <button class="modal-main-btn" onclick="importData()" style="margin-top:10px;"><i class="fa-solid fa-file-import"></i> Khôi phục</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="themeModal">
+        <div class="modal-box" style="max-width:420px;">
+            <button class="modal-close" onclick="closeModal('themeModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-palette"></i> Đổi màu chủ đề</div>
+            <label class="form-label">MÀU NỀN</label>
+            <input type="color" class="form-input" id="bgColor" onchange="applyTheme()">
+            <label class="form-label">MÀU NÚT</label>
+            <input type="color" class="form-input" id="btnColor" onchange="applyTheme()">
+            <button class="modal-main-btn" onclick="saveTheme()"><i class="fa-solid fa-check"></i> Lưu</button>
         </div>
     </div>
 
@@ -408,7 +487,7 @@
     </div>
 
     <script>
-        // ===== CẤU HÌNH GITHUB GIST (GIỮ NGUYÊN) =====
+        // CẤU HÌNH GIST - GIỮ NGUYÊN
         const GIST_ID = "4c8fab5608c8cdfc752c116d2bb958b1";
         const GIST_FILE = "data.json";
         const GIST_TOKEN = "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";
@@ -418,7 +497,7 @@
         let ADMIN_CODE = localStorage.getItem('adminCode') || DEFAULT_ADMIN_CODE;
         let isAdmin = localStorage.getItem('isAdmin') === 'true';
         let currentCategory = 'all';
-        let maintenanceMode = false;
+        let maintenanceMode = localStorage.getItem('maintenanceMode') === 'true';
 
         let catGroups = [
             { id: 'group1', name: 'TÔI', icon: 'fa-user', categories: ['ff', 'lq'] },
@@ -612,6 +691,11 @@
         document.getElementById('detailModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
         document.getElementById('loginModal').addEventListener('click', function(e) { if (e.target === this) closeModal('loginModal'); });
         document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeModal('addModal'); });
+        document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editModal'); });
+        document.getElementById('editSelectModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editSelectModal'); });
+        document.getElementById('changePassModal').addEventListener('click', function(e) { if (e.target === this) closeModal('changePassModal'); });
+        document.getElementById('backupModal').addEventListener('click', function(e) { if (e.target === this) closeModal('backupModal'); });
+        document.getElementById('themeModal').addEventListener('click', function(e) { if (e.target === this) closeModal('themeModal'); });
         document.getElementById('addCategoryModal').addEventListener('click', function(e) { if (e.target === this) closeModal('addCategoryModal'); });
         document.getElementById('deleteCategoryModal').addEventListener('click', function(e) { if (e.target === this) closeModal('deleteCategoryModal'); });
         document.getElementById('addGroupModal').addEventListener('click', function(e) { if (e.target === this) closeModal('addGroupModal'); });
@@ -722,6 +806,140 @@
             document.getElementById('mainLink').value = '';
             document.getElementById('subRowsContainer').innerHTML = '';
             closeModal('addModal');
+        }
+
+        function addEditSubRow(labelVal = '', linkVal = '') {
+            const container = document.getElementById('editSubRowsContainer');
+            const row = document.createElement('div');
+            row.className = 'sub-row';
+            row.innerHTML = `<input type="text" class="sub-label-input" placeholder="Tiêu đề phụ" value="${labelVal.replace(/"/g, '&quot;')}"><input type="text" class="sub-link-input" placeholder="Link phụ" value="${linkVal.replace(/"/g, '&quot;')}"><button class="remove-row-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+            container.appendChild(row);
+        }
+        function showEditHackModal() {
+            document.getElementById('editSelectModal').style.display = 'flex';
+            const sel = document.getElementById('editSelect');
+            sel.innerHTML = '';
+            hacks.forEach(h => { sel.innerHTML += `<option value="${h.id}">${h.title}</option>`; });
+        }
+        function loadEditForm() {
+            const id = document.getElementById('editSelect').value;
+            const hack = hacks.find(h => h.id === id);
+            if (!hack) { showToast('Chọn bài để sửa!', 'error'); return; }
+            document.getElementById('editTitle').value = hack.title;
+            document.getElementById('editDesc').value = hack.desc || '';
+            document.getElementById('editPreviewUrl').value = hack.previewUrl || '';
+            const catSel = document.getElementById('editCategory');
+            catSel.innerHTML = '';
+            categories.filter(c => c !== 'all').forEach(c => { catSel.innerHTML += `<option value="${c}" ${c === hack.category ? 'selected' : ''}>${catLabels[c] || c}</option>`; });
+            document.getElementById('editMainLink').value = hack.mainLink;
+            document.getElementById('editSubRowsContainer').innerHTML = '';
+            hack.sections.forEach(sec => {
+                sec.links.forEach(link => addEditSubRow(sec.label, link));
+            });
+            if (hack.sections.length === 0) addEditSubRow();
+            document.getElementById('editModal').style.display = 'flex';
+            closeModal('editSelectModal');
+        }
+        function saveEditHack() {
+            const id = document.getElementById('editSelect').value;
+            const hack = hacks.find(h => h.id === id);
+            if (!hack) { showToast('Không tìm thấy bài!', 'error'); return; }
+            hack.title = document.getElementById('editTitle').value.trim();
+            hack.desc = document.getElementById('editDesc').value.trim();
+            hack.previewUrl = document.getElementById('editPreviewUrl').value.trim();
+            hack.category = document.getElementById('editCategory').value;
+            hack.mainLink = document.getElementById('editMainLink').value.trim();
+            const rows = document.querySelectorAll('#editSubRowsContainer .sub-row');
+            const sections = [];
+            rows.forEach(row => {
+                const label = row.querySelector('.sub-label-input').value.trim();
+                const link = row.querySelector('.sub-link-input').value.trim();
+                if (link) {
+                    const existing = sections.find(s => s.label === label);
+                    if (existing) existing.links.push(link);
+                    else sections.push({ label: label, links: [link] });
+                }
+            });
+            hack.sections = sections.length > 0 ? sections : [{ label: "Link tải:", links: [hack.mainLink] }];
+            saveData();
+            renderList();
+            showToast('Đã sửa bài thành công!');
+            closeModal('editModal');
+        }
+        function editHackFromCard(id) {
+            const hack = hacks.find(h => h.id === id);
+            if (!hack) return;
+            document.getElementById('editSelect').innerHTML = `<option value="${id}" selected>${hack.title}</option>`;
+            loadEditForm();
+        }
+
+        function showChangePassModal() { document.getElementById('changePassModal').style.display = 'flex'; document.getElementById('oldPass').value = ''; document.getElementById('newPass').value = ''; document.getElementById('confirmNewPass').value = ''; }
+        function changePassword() {
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+            const confirmPass = document.getElementById('confirmNewPass').value;
+            if (oldPass !== ADMIN_CODE) { showToast('Mã cũ sai!', 'error'); return; }
+            if (newPass.length < 4) { showToast('Mã mới phải dài ít nhất 4 ký tự!', 'error'); return; }
+            if (newPass !== confirmPass) { showToast('Xác nhận mã mới không khớp!', 'error'); return; }
+            ADMIN_CODE = newPass;
+            localStorage.setItem('adminCode', ADMIN_CODE);
+            showToast('Đã đổi mã bí mật thành công!');
+            closeModal('changePassModal');
+        }
+
+        function showBackupModal() { document.getElementById('backupModal').style.display = 'flex'; document.getElementById('restoreData').value = ''; }
+        function exportData() {
+            const data = JSON.stringify({ hacks, categories, catGroups }, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Đã tải xuống dữ liệu!');
+        }
+        function importData() {
+            const json = document.getElementById('restoreData').value.trim();
+            if (!json) { showToast('Dán JSON để khôi phục!', 'error'); return; }
+            try {
+                const data = JSON.parse(json);
+                hacks = data.hacks || [];
+                categories = data.categories || categories;
+                catGroups = data.catGroups || catGroups;
+                saveData();
+                renderList();
+                renderCategories();
+                showToast('Đã khôi phục dữ liệu!');
+                closeModal('backupModal');
+            } catch(e) {
+                showToast('JSON không hợp lệ!', 'error');
+            }
+        }
+
+        function showThemeModal() {
+            document.getElementById('themeModal').style.display = 'flex';
+            document.getElementById('bgColor').value = localStorage.getItem('bgColor') || '#04060d';
+            document.getElementById('btnColor').value = localStorage.getItem('btnColor') || '#00e5ff';
+        }
+        function applyTheme() {
+            document.documentElement.style.setProperty('--bg', document.getElementById('bgColor').value);
+            document.documentElement.style.setProperty('--cyan', document.getElementById('btnColor').value);
+        }
+        function saveTheme() {
+            localStorage.setItem('bgColor', document.getElementById('bgColor').value);
+            localStorage.setItem('btnColor', document.getElementById('btnColor').value);
+            showToast('Đã lưu màu chủ đề!');
+            closeModal('themeModal');
+        }
+
+        function incrementVisits() {
+            const visits = parseInt(localStorage.getItem('totalVisits') || '0') + 1;
+            localStorage.setItem('totalVisits', visits);
+        }
+        function showStats() {
+            const visits = parseInt(localStorage.getItem('totalVisits') || '0');
+            alert('Tổng lượt truy cập web: ' + visits);
         }
 
         function showAddCategoryModal() { document.getElementById('addCategoryModal').style.display = 'flex'; document.getElementById('newCatName').value = ''; }
