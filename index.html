@@ -108,6 +108,9 @@
         .btn-download:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 35px rgba(0,229,255,0.6); }
         .btn-more { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid var(--border2); color: var(--text); border-radius: 14px; padding: 14px 18px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .btn-more:hover { background: rgba(0,229,255,0.15); border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
+        .edit-btn { position: absolute; top: 15px; left: 58px; background: rgba(74,158,255,0.15); border: 1px solid rgba(74,158,255,0.3); color: var(--blue); width: 35px; height: 35px; border-radius: 10px; cursor: pointer; font-size: 15px; display: none; align-items: center; justify-content: center; transition: all 0.3s; z-index: 10; }
+        .edit-btn:hover { background: var(--blue); color: white; transform: scale(1.1) rotate(90deg); }
+        .card.admin-mode .edit-btn { display: flex; }
         .delete-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,59,59,0.15); border: 1px solid rgba(255,59,59,0.3); color: var(--red); width: 35px; height: 35px; border-radius: 10px; cursor: pointer; font-size: 15px; display: none; align-items: center; justify-content: center; transition: all 0.3s; z-index: 10; }
         .delete-btn:hover { background: var(--red); color: white; transform: scale(1.1) rotate(90deg); }
         .card.admin-mode .delete-btn { display: flex; }
@@ -219,7 +222,7 @@
             <div class="logo-wrap">
                 <img src="https://i.postimg.cc/vHCDCdDQ/IMG-6034.jpg" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/48/000000/00E5FF?text=TOP'">
                 <span class="logo-text">DownloadHub</span>
-                <span class="version-badge">v5.0</span>
+                <span class="version-badge">v6.0</span>
             </div>
         </div>
         <div class="header-right">
@@ -231,7 +234,6 @@
         </div>
     </header>
 
-    <!-- Sidebar -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -264,11 +266,13 @@
 
     <div class="admin-menu" id="adminMenu">
         <button class="admin-menu-btn" onclick="showAddHackModal()"><i class="fa-solid fa-plus"></i> Tạo bài đăng</button>
+        <button class="admin-menu-btn" onclick="showEditHackModal()"><i class="fa-solid fa-pen"></i> Sửa bài đăng</button>
         <button class="admin-menu-btn" onclick="showAddCategoryModal()"><i class="fa-solid fa-folder-plus"></i> Tạo danh mục</button>
         <button class="admin-menu-btn" onclick="showDeleteCategoryModal()"><i class="fa-solid fa-folder-minus"></i> Xóa danh mục</button>
         <button class="admin-menu-btn" onclick="showAddGroupModal()"><i class="fa-solid fa-layer-group"></i> Tạo danh mục lớn</button>
         <button class="admin-menu-btn" onclick="showDeleteGroupModal()"><i class="fa-solid fa-layer-minus"></i> Xóa danh mục lớn</button>
         <button class="admin-menu-btn" onclick="showDeleteHackModal()"><i class="fa-solid fa-trash"></i> Xóa bài đăng</button>
+        <button class="admin-menu-btn" onclick="showChangePassModal()"><i class="fa-solid fa-key"></i> Đổi mã bí mật</button>
         <button class="admin-menu-btn" onclick="showNoticeModal()"><i class="fa-solid fa-bullhorn"></i> Tạo thông báo</button>
         <button class="admin-menu-btn" onclick="showMaintenanceModal()"><i class="fa-solid fa-wrench"></i> Bật/Tắt bảo trì</button>
         <button class="admin-menu-btn" onclick="showReportModal()"><i class="fa-solid fa-flag"></i> Xem báo cáo</button>
@@ -324,12 +328,60 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('editModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-pen"></i> Sửa bài đăng</div>
+            <div class="modal-subtitle">Cập nhật thông tin bài viết</div>
+            <label class="form-label">TIÊU ĐỀ CHÍNH</label>
+            <input type="text" class="form-input" id="editTitle">
+            <label class="form-label">MÔ TẢ</label>
+            <textarea class="form-textarea" id="editDesc"></textarea>
+            <label class="form-label">ẢNH/VIDEO XEM TRƯỚC (URL)</label>
+            <input type="text" class="form-input" id="editPreviewUrl">
+            <label class="form-label">DANH MỤC</label>
+            <select class="form-select" id="editCategory"></select>
+            <label class="form-label">LINK CHÍNH</label>
+            <input type="text" class="form-input" id="editMainLink">
+            <label class="form-label">TIÊU ĐỀ PHỤ + LINK PHỤ</label>
+            <div id="editSubRowsContainer"></div>
+            <button class="add-sub-btn" onclick="addEditSubRow()"><i class="fa-solid fa-plus"></i> Thêm tiêu đề phụ & link phụ</button>
+            <button class="modal-main-btn" onclick="saveEditHack()"><i class="fa-solid fa-save"></i> Lưu thay đổi</button>
+            <button class="modal-main-btn" onclick="closeModal('editModal')" style="background:var(--red); margin-top:10px;"><i class="fa-solid fa-xmark"></i> Hủy</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editSelectModal">
+        <div class="modal-box" style="max-width:520px;">
+            <button class="modal-close" onclick="closeModal('editSelectModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-pen"></i> Chọn bài để sửa</div>
+            <label class="form-label">CHỌN BÀI ĐĂNG</label>
+            <select class="form-select" id="editSelect"></select>
+            <button class="modal-main-btn" onclick="loadEditForm()"><i class="fa-solid fa-arrow-right"></i> Tiếp tục</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="changePassModal">
+        <div class="modal-box" style="max-width:420px;">
+            <button class="modal-close" onclick="closeModal('changePassModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title"><i class="fa-solid fa-key"></i> Đổi mã bí mật</div>
+            <div class="modal-subtitle">Thay đổi mã quản trị</div>
+            <label class="form-label">MÃ CŨ</label>
+            <input type="password" class="form-input" id="oldPass">
+            <label class="form-label">MÃ MỚI</label>
+            <input type="password" class="form-input" id="newPass">
+            <label class="form-label">XÁC NHẬN MÃ MỚI</label>
+            <input type="password" class="form-input" id="confirmNewPass">
+            <button class="modal-main-btn" onclick="changePassword()"><i class="fa-solid fa-check"></i> Đổi mã</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="addCategoryModal">
         <div class="modal-box" style="max-width:420px;">
             <button class="modal-close" onclick="closeModal('addCategoryModal')"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-title"><i class="fa-solid fa-folder-plus"></i> Tạo danh mục</div>
             <label class="form-label">TÊN DANH MỤC</label>
-            <input type="text" class="form-input" id="newCatName" placeholder="VD: Hack Liên Quân">
+            <input type="text" class="form-input" id="newCatName">
             <button class="modal-main-btn" onclick="addCategory()"><i class="fa-solid fa-check"></i> Tạo</button>
         </div>
     </div>
@@ -408,14 +460,15 @@
 
     <script>
         // ===== CẤU HÌNH GITHUB GIST =====
-        const GIST_ID = "4c8fab5608c8cdfc752c116d2bb958b1"; // Gist ID
-        const GIST_FILE = "data.json"; // Tên file trong Gist
-        const GIST_TOKEN = "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"; // Token của bạn
+        const GIST_ID = "4c8fab5608c8cdfc752c116d2bb958b1";
+        const GIST_FILE = "data.json";
+        const GIST_TOKEN = "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";
         const GIST_RAW = "https://gist.githubusercontent.com/binhgold0345-wq/4c8fab5608c8cdfc752c116d2bb958b1/raw/cf2dc704b000752cc103284ea597ef0af1215fbd/data.json";
 
-        // ===== MÃ BÍ MẬT ADMIN =====
-        const ADMIN_CODE = "0345498359k";
-        let isAdmin = false;
+        // ===== MÃ BÍ MẬT ADMIN (LƯU TRONG LOCALSTORAGE ĐỂ ĐỔI ĐƯỢC) =====
+        const DEFAULT_ADMIN_CODE = "0345498359k";
+        let ADMIN_CODE = localStorage.getItem('adminCode') || DEFAULT_ADMIN_CODE;
+        let isAdmin = localStorage.getItem('isAdmin') === 'true'; // Lưu trạng thái đăng nhập
         let currentCategory = 'all';
         let maintenanceMode = false;
 
@@ -429,7 +482,7 @@
         const catIcons = { 'all': 'fa-layer-group', 'ff': 'fa-crosshairs', 'lq': 'fa-shield-halved', '8ball': 'fa-circle', 'minecraft': 'fa-cube' };
         const catColors = { 'all': '#ffffff', 'ff': '#ff2d95', 'lq': '#4a9eff', '8ball': '#ffd700', 'minecraft': '#00ff88' };
 
-        let hacks = []; // Sẽ load từ Gist
+        let hacks = [];
 
         // ===== TẠO SAO =====
         function createStars() {
@@ -517,6 +570,7 @@
                         <div class="card-title">${hack.title}</div>
                     </div>
                     <div class="id-tag">${hack.id}</div>
+                    <button class="edit-btn" onclick="editHackFromCard('${hack.id}')" title="Sửa bài"><i class="fa-solid fa-pen"></i></button>
                     <button class="delete-btn" onclick="deleteHack('${hack.id}')" title="Xóa bài"><i class="fa-solid fa-trash"></i></button>
                     <div class="card-cat" style="color:${color}; border-color:${color};">${catLabels[hack.category] || hack.category}</div>
                     <div class="card-desc">${hack.desc || 'Chưa có mô tả'}</div>
@@ -544,11 +598,31 @@
             renderList();
         }
 
-        // ===== COPY LINK =====
+        // ===== SAO CHÉP LINK ĐÚNG BÀI =====
         function copyPostLink(id) {
             const cleanId = id.replace('#', '');
             const url = window.location.origin + window.location.pathname + '?id=' + cleanId;
-            navigator.clipboard.writeText(url).then(() => showToast('Đã sao chép link bài!')).catch(() => showToast('Lỗi copy!', 'error'));
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Đã sao chép link bài: ' + url);
+            }).catch(() => showToast('Lỗi copy!', 'error'));
+        }
+
+        // ===== MỞ MODAL TỪ URL (SỬA LỖI) =====
+        function openModalFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idParam = urlParams.get('id');
+            if (idParam) {
+                const fullId = '#' + idParam;
+                // Chờ dữ liệu load xong rồi mới tìm
+                setTimeout(() => {
+                    const hack = hacks.find(h => h.id === fullId);
+                    if (hack) {
+                        openModal(fullId);
+                    } else {
+                        showToast('Không tìm thấy bài đăng với ID: ' + idParam, 'error');
+                    }
+                }, 500);
+            }
         }
 
         // ===== MỞ MODAL =====
@@ -608,6 +682,9 @@
         document.getElementById('detailModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
         document.getElementById('loginModal').addEventListener('click', function(e) { if (e.target === this) closeModal('loginModal'); });
         document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeModal('addModal'); });
+        document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editModal'); });
+        document.getElementById('editSelectModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editSelectModal'); });
+        document.getElementById('changePassModal').addEventListener('click', function(e) { if (e.target === this) closeModal('changePassModal'); });
         document.getElementById('addCategoryModal').addEventListener('click', function(e) { if (e.target === this) closeModal('addCategoryModal'); });
         document.getElementById('deleteCategoryModal').addEventListener('click', function(e) { if (e.target === this) closeModal('deleteCategoryModal'); });
         document.getElementById('addGroupModal').addEventListener('click', function(e) { if (e.target === this) closeModal('addGroupModal'); });
@@ -640,7 +717,7 @@
         }
         function closePopupNotify() { document.getElementById('popupNotify').style.display = 'none'; }
 
-        // ===== ADMIN LOGIN =====
+        // ===== ADMIN LOGIN (LƯU TRẠNG THÁI) =====
         function toggleAdminMenu() {
             if (!isAdmin) { showLoginModal(); return; }
             const menu = document.getElementById('adminMenu');
@@ -655,6 +732,7 @@
             const pass = document.getElementById('adminPass').value;
             if (pass === ADMIN_CODE) {
                 isAdmin = true;
+                localStorage.setItem('isAdmin', 'true'); // Lưu trạng thái
                 showToast('Đăng nhập thành công!');
                 document.getElementById('adminPass').value = '';
                 closeModal('loginModal');
@@ -669,6 +747,7 @@
         }
         function logoutAdmin() {
             isAdmin = false;
+            localStorage.setItem('isAdmin', 'false'); // Xóa trạng thái
             document.getElementById('adminMenu').style.display = 'none';
             showToast('Đã đăng xuất!');
             renderList();
@@ -721,6 +800,87 @@
             document.getElementById('mainLink').value = '';
             document.getElementById('subRowsContainer').innerHTML = '';
             closeModal('addModal');
+        }
+
+        // ===== SỬA BÀI =====
+        function addEditSubRow(labelVal = '', linkVal = '') {
+            const container = document.getElementById('editSubRowsContainer');
+            const row = document.createElement('div');
+            row.className = 'sub-row';
+            row.innerHTML = `<input type="text" class="sub-label-input" placeholder="Tiêu đề phụ" value="${labelVal.replace(/"/g, '&quot;')}"><input type="text" class="sub-link-input" placeholder="Link phụ" value="${linkVal.replace(/"/g, '&quot;')}"><button class="remove-row-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+            container.appendChild(row);
+        }
+        function showEditHackModal() {
+            document.getElementById('editSelectModal').style.display = 'flex';
+            const sel = document.getElementById('editSelect');
+            sel.innerHTML = '';
+            hacks.forEach(h => { sel.innerHTML += `<option value="${h.id}">${h.title}</option>`; });
+        }
+        function loadEditForm() {
+            const id = document.getElementById('editSelect').value;
+            const hack = hacks.find(h => h.id === id);
+            if (!hack) { showToast('Chọn bài để sửa!', 'error'); return; }
+            document.getElementById('editTitle').value = hack.title;
+            document.getElementById('editDesc').value = hack.desc || '';
+            document.getElementById('editPreviewUrl').value = hack.previewUrl || '';
+            const catSel = document.getElementById('editCategory');
+            catSel.innerHTML = '';
+            categories.filter(c => c !== 'all').forEach(c => { catSel.innerHTML += `<option value="${c}" ${c === hack.category ? 'selected' : ''}>${catLabels[c] || c}</option>`; });
+            document.getElementById('editMainLink').value = hack.mainLink;
+            document.getElementById('editSubRowsContainer').innerHTML = '';
+            hack.sections.forEach(sec => {
+                sec.links.forEach(link => addEditSubRow(sec.label, link));
+            });
+            if (hack.sections.length === 0) addEditSubRow();
+            document.getElementById('editModal').style.display = 'flex';
+            closeModal('editSelectModal');
+        }
+        function saveEditHack() {
+            const id = document.getElementById('editSelect').value;
+            const hack = hacks.find(h => h.id === id);
+            if (!hack) { showToast('Không tìm thấy bài!', 'error'); return; }
+            hack.title = document.getElementById('editTitle').value.trim();
+            hack.desc = document.getElementById('editDesc').value.trim();
+            hack.previewUrl = document.getElementById('editPreviewUrl').value.trim();
+            hack.category = document.getElementById('editCategory').value;
+            hack.mainLink = document.getElementById('editMainLink').value.trim();
+            const rows = document.querySelectorAll('#editSubRowsContainer .sub-row');
+            const sections = [];
+            rows.forEach(row => {
+                const label = row.querySelector('.sub-label-input').value.trim();
+                const link = row.querySelector('.sub-link-input').value.trim();
+                if (link) {
+                    const existing = sections.find(s => s.label === label);
+                    if (existing) existing.links.push(link);
+                    else sections.push({ label: label, links: [link] });
+                }
+            });
+            hack.sections = sections.length > 0 ? sections : [{ label: "Link tải:", links: [hack.mainLink] }];
+            saveData();
+            renderList();
+            showToast('Đã sửa bài thành công!');
+            closeModal('editModal');
+        }
+        function editHackFromCard(id) {
+            const hack = hacks.find(h => h.id === id);
+            if (!hack) return;
+            document.getElementById('editSelect').innerHTML = `<option value="${id}" selected>${hack.title}</option>`;
+            loadEditForm();
+        }
+
+        // ===== ĐỔI MÃ BÍ MẬT =====
+        function showChangePassModal() { document.getElementById('changePassModal').style.display = 'flex'; document.getElementById('oldPass').value = ''; document.getElementById('newPass').value = ''; document.getElementById('confirmNewPass').value = ''; }
+        function changePassword() {
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+            const confirmPass = document.getElementById('confirmNewPass').value;
+            if (oldPass !== ADMIN_CODE) { showToast('Mã cũ sai!', 'error'); return; }
+            if (newPass.length < 4) { showToast('Mã mới phải dài ít nhất 4 ký tự!', 'error'); return; }
+            if (newPass !== confirmPass) { showToast('Xác nhận mã mới không khớp!', 'error'); return; }
+            ADMIN_CODE = newPass;
+            localStorage.setItem('adminCode', ADMIN_CODE);
+            showToast('Đã đổi mã bí mật thành công!');
+            closeModal('changePassModal');
         }
 
         // ===== DANH MỤC THƯỜNG =====
@@ -848,18 +1008,12 @@
             closeModal('reportModal');
         }
 
-        // ===== LƯU DỮ LIỆU LÊN GIST (DÙNG TOKEN) =====
+        // ===== LƯU DỮ LIỆU LÊN GIST =====
         function saveData() {
             localStorage.setItem('myHackData', JSON.stringify({ hacks, categories, catGroups }));
-
-            // Ghi lên Gist qua GitHub API
             const updateUrl = `https://api.github.com/gists/${GIST_ID}`;
             const payload = {
-                files: {
-                    [GIST_FILE]: {
-                        content: JSON.stringify({ hacks, categories, catGroups })
-                    }
-                }
+                files: { [GIST_FILE]: { content: JSON.stringify({ hacks, categories, catGroups }) } }
             };
             fetch(updateUrl, {
                 method: 'PATCH',
@@ -876,7 +1030,7 @@
 
         // ===== TẢI DỮ LIỆU TỪ GIST =====
         function loadDataFromGist() {
-            fetch(GIST_RAW).then(r => r.json()).then(data => {
+            return fetch(GIST_RAW).then(r => r.json()).then(data => {
                 if (data && data.hacks) {
                     hacks = data.hacks;
                     categories = data.categories;
@@ -884,7 +1038,6 @@
                     renderList();
                     renderCategories();
                 } else {
-                    // Nếu Gist rỗng, dùng dữ liệu mẫu và lưu lên Gist
                     hacks = [
                         { id: "#478842", title: "MENU ANDROID VIỆT.co", desc: "Menu Full tính năng - Cần acc chính", category: "ff", mainLink: "https://link4m.net/example1", previewUrl: "", sections: [{ label: "Get Key:", links: ["https://keycheater.site/getkey/zennymod1"] }, { label: "Dùng FF này:", links: ["https://www.mediafire.com/file/04qrhmnuiq91n8m/FreeFire+ch%E1%BA%BFt+%C4%91%E1%BA%A1i+ob54.apk/file"] }, { label: "Ai Ban Thì Dùng Vpn:", links: ["https://www.mediafire.com/file/2ekf3us5dqpb7ow/BYPASS+VPN_6.1.4.apk/file"] }, { label: "Trang phụ:", links: ["gin.freefireind.in", "gin.freefiremobile.com"] }] },
                         { id: "#015028", title: "MENU ZENNY MOD V17 CẦN ACC CHÍNH", desc: "Hack FF no key - bản mới nhất", category: "ff", mainLink: "https://link4m.net/90xqNw5", previewUrl: "", sections: [{ label: "Get Key:", links: ["https://keycheater.site/getkey/zennymod17"] }, { label: "Link dự phòng:", links: ["https://mediafire.com/zennyv17"] }] },
@@ -898,7 +1051,6 @@
                 }
             }).catch(err => {
                 console.error('Lỗi tải Gist:', err);
-                // Fallback về localStorage
                 const saved = localStorage.getItem('myHackData');
                 if (saved) {
                     try {
@@ -913,21 +1065,6 @@
             });
         }
 
-        // ===== MỞ MODAL TỪ URL =====
-        function openModalFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const idParam = urlParams.get('id');
-            if (idParam) {
-                const fullId = '#' + idParam;
-                const hack = hacks.find(h => h.id === fullId);
-                if (hack) {
-                    setTimeout(() => openModal(fullId), 300);
-                } else {
-                    showToast('Không tìm thấy bài đăng với ID: ' + idParam, 'error');
-                }
-            }
-        }
-
         // ===== KHỞI CHẠY =====
         createStars();
         loadDataFromGist().then(() => {
@@ -937,4 +1074,4 @@
         });
     </script>
 </body>
-  </html>
+</html>
